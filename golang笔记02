@@ -1,0 +1,726 @@
+Golang笔记02
+1.
+2.打印A的内存地址
+
+func main() {
+    var a = 10
+    fn1(a)
+    fmt.Println(a) //值类型 5
+    fn2(&a)
+    fmt.Println(a) //根据地址改变A的值 100
+}
+
+func fn1(b int) {
+    b = 50
+}
+
+func fn2(b *int) {
+    *b = 100
+}
+
+3.定义指针
+func main() {
+    var a = 10
+    var p *int = &a 
+}
+
+4.引用类型 声明时必须同时分配内存
+func main() {
+    错误写法 没有为引用类型分配内存
+    var a *int
+    *a = 100
+    fmt.Println(*a)
+
+    //正确写法
+    var a = new(int)
+    *a = 100
+    fmt.Println(*a)
+}
+
+5.与make的区别
+
+6.自定义函数类型与函数别名的区别
+func main() {
+    //自定义函数类型与函数别名的区别
+
+    //1.自定义函数类型
+    type myInt int
+    var a myInt = 10
+    fmt.Printf("值:%v , 类型:%T", a, a) //值:10 , 类型:main.myInt
+    //2.函数别名
+    type myInt = int
+    var a myInt = 10
+    fmt.Printf("值:%v , 类型:%T", a, a) //值:10 , 类型:int
+}
+
+6.Golang中的结构体
+
+type Person struct {
+    age  int
+    name string
+    sex  string
+}
+
+func main() {
+    //1.实例化方法01
+    var p1 Person
+    p1.age = 20
+    p1.name = "wangchenglong"
+    p1.sex = "man"
+    //fmt.Printf("值 %#v ,类型%T",p1,p1)//值 main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型main.Person
+    //2.实例化方法02
+    var p2 = new(Person)
+    p2.age = 20
+    p2.name = "wangchenglong"
+    p2.sex = "man"
+    //fmt.Printf("值 %#v ,类型%T", p2, p2) //值 &main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型*main.Person
+    //3.实例化方法03
+    var p3 = &Person{}
+    p3.age = 20
+    p3.name = "wangchenglong"
+    p3.sex = "man"
+    //fmt.Printf("值 %#v ,类型%T", p3, p3) //值 &main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型*main.Person
+    //4.实例化方法04
+    // var p4 = Person{
+    //  age:  20,
+    //  name: "wangchenglong",
+    //  sex:  "man",
+    // }
+    //fmt.Printf("值 %#v ,类型%T", p4, p4)//值 main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型main.Person
+    //5.实例化方法05
+    var p5 = &Person{
+        age:  20,
+        name: "wangchenglong",
+        sex:  "man",
+    }
+    fmt.Printf("值 %#v ,类型%T\n", p5, p5) //值 &main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型*main.Person
+    //6.实例化方法06
+    var p6 = &Person{
+        20,
+        "wangchenglong",
+        "man",
+    }
+    fmt.Printf("值 %#v ,类型%T", p6, p6) //值 &main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型*main.Person
+}
+//7.实例化方法07
+    var p6 = Person{
+        20,
+        "wangchenglong",
+        "man",
+    }
+    fmt.Printf("值 %#v ,类型%T", p6, p6) //值 &main.Person{age:20, name:"wangchenglong", sex:"man"} ,类型*main.Person
+}
+
+
+
+7.结构体方法
+//结构体方法
+func (p Person) PrintInfo() {
+    fmt.Println("值 %#v ,类型%T", p, p)
+}
+8.两种方法的区别
+func (p *Person) SetInfo(name string, age int) {
+    p.name = name
+    p.age = age
+}
+
+func(p Person)SetInfo(name string,age int){
+    p.name = name
+    p.age = age
+}
+传入指针类型才可以真正修改结构体的属性，否则值类型是不能真正修改属性的
+9.匿名结构体(其中类型必须唯一)
+type Person struct{
+    string 
+    int 
+    //string 
+}
+10.结构体中嵌套结构体，且如果是引用类型 需要在声明同时 分配空间
+type User struct {
+    name    string
+    age     int
+    Hobby   []string
+    address Address
+}
+
+type Address struct {
+    addrname map[int]string
+    phone    int
+}
+func main() {
+    var a User
+    a.name = "wangchenglong"
+    a.age = 18
+    a.Hobby = make([]string, 3, 3)
+    a.Hobby[0] = "写代码"
+    a.Hobby[1] = "打篮球"
+    a.Hobby[2] = "玩游戏"
+    a.address.phone = 123456
+    a.address.addrname = make(map[int]string)
+    a.address.addrname[0] = "濮阳市"
+    a.address.addrname[1] = "胜利东路"
+    a.address.addrname[0] = "胜安小区"
+    fmt.Printf("%#v", a)
+}
+11.访问结构体时现在 现在结构体中查找，找不到则到结构体中嵌套的结构体中查找
+在嵌套匿名结构体中，以下两种写法是一样的
+fmt.Println(a.phone)
+    fmt.Println(a.Address.phone)
+12.结构体中 嵌套两个含有相同属性的匿名结构体，赋值需要指定匿名结构体类型
+type User struct {
+    name  string
+    age   int
+    Hobby []string
+    Address
+    Email
+}
+
+type Address struct {
+    phone int
+}
+type Email struct {
+    phone int
+}
+
+//匿名结构体中 有相同属性的 赋值需要指定结构体名称
+func main() {
+    var a User
+    //错误写法a.phone = 123456
+    //正确写法
+    a.Address.phone = 123456
+    fmt.Println(a.Address.phone)
+}
+13.结构体的继承
+//结构体的继承 使用的就是匿名结构体的嵌套
+type Animal struct {
+    name string
+}
+
+func (a Animal) run() {
+    fmt.Printf("%v在跑", a.name)
+}
+type Dog struct {
+    age int
+    Animal
+}
+func (d Dog) bark() {
+    fmt.Printf("%v在叫", d.name)
+}
+func main() {
+    var dog = Dog{
+        age: 10,
+        Animal: Animal{
+            name: "fy",
+        },
+    }
+    dog.run()
+    dog.bark()
+}
+14.传入一个指针，并赋值
+type User struct {
+    name string
+    *Address
+}
+
+type Address struct {
+    address string
+}
+
+func main() {
+    var u = User{
+        name: "wangchenglong",
+        Address: &Address{
+            address: "濮阳",
+        },
+    }
+    fmt.Printf(u.address)
+}
+15.将结构体转换为JSON字符串
+type Student struct {
+    Name  string
+    Age   int
+    Class string //私有类型不能转换为json字符串
+    Phone int
+}
+
+func main() {
+    var s = Student{
+        Name:  "wangchenglong",
+        Age:   18,
+        Class: "一年级",
+        Phone: 15617444,
+    }
+    jsonByte, _ := json.Marshal(s)
+    fmt.Println(string(jsonByte))
+}
+
+16.将JSON字符串转换为结构体对象，注意属性首字母小写表示私有属性大写表公有属性
+func main() {
+    var s = Student{
+        Name:  "wangchenglong",
+        Age:   18, //私有属性JSON包不能访问 首字母小写如age :18,
+                  //表示age为私有属性则无法被JSON包访问
+        Class: "一年级",
+        Phone: 15617444,
+    }
+    jsonstr := `{"Name":"wangchenglong","Age":18,"Class":"一年级","Phone":15617444}`
+    error := json.Unmarshal([]byte(jsonstr), &s)
+    if error != nil {
+        fmt.Print(error)
+    }
+    fmt.Printf("%#v", s)
+}
+
+
+16.结构体标签 用于指定JSON字符串转换为结构体的Key是什么
+//结构体标签 指定结构体转换为JSON字符串的key
+type Student struct {
+    Name  string `json:"na"`
+    Age   int    `json: age`
+    Class string `json：class` //私有类型不能转换为json字符串
+    Phone int    `json:mobilephone`
+}
+
+func main() {
+    var s = Student{
+        Name:  "wabngchenglong",
+        Age:   18,
+        Class: "一年级",
+        Phone: 15455454,
+    }
+    jsonByte, _ := json.Marshal(s)
+    fmt.Println(string(jsonByte))//{"na":"wabngchenglong","Age":18,"Class":"一年级","Phone":15455454}
+}
+
+17.结构体中含有引用类型的 序列化
+
+//序列化:将对象转换为字符串序列
+//JSON序列化:将结构体转换为JSON字符串序列
+//反序列化:将JSON字符串序列转换为结构体
+type Class struct {
+    ClassId    string
+    StudentMap []Student
+}
+
+type Student struct {
+    Name  string
+    StuId int
+}
+func main() {
+    var c = Class{
+        ClassId:    "001班",
+        StudentMap: make([]Student, 0),
+    }
+    for i := 0; i < 10; i++ {
+        s := Student{
+            Name:  fmt.Sprintf("学生_%v", i),
+            StuId: i,
+        }
+        c.StudentMap = append(c.StudentMap, s)
+    }
+    stustr, _ := json.Marshal(c)
+    fmt.Println(string(stustr))
+}
+
+18.结构体中含有引用类型的 反序列化
+type Class struct {
+    ClassId    string
+    StudentMap []Student
+}
+
+type Student struct {
+    Name  string
+    StuId int
+}
+func main() {
+    var cla = &Class{}
+    str := `{"ClassId":"001班","StudentMap":[{"Name":"学生_0","StuId":0},{"Name":"学生_1","StuId":1},{"Name":"学生_2","StuId":2},{"Name":"学生_3","StuId":3},{"Name":"学生_4","StuId":4},{"Name":"学生_5","StuId":5},{"Name":"学生_6","StuId":6},{"Name":"学生_7","StuId":7},{"Name":"学生_8","StuId":8},{"Name":"学生_9","StuId":9}]}`
+    error := json.Unmarshal([]byte(str), cla)
+    if error != nil {
+        fmt.Println(error)
+    } else {
+        fmt.Println(cla)
+    }
+}
+
+19.go mod 
+
+20.自定义包 与imprt导入包
+Package 包名 一定要放在代码的第一行
+一个包里多个go文件的方法不能重复
+
+package main
+
+import (
+    "fmt"
+    "wcl/calc"
+)
+func main() {
+    a := calc.Add(1, 2)
+    fmt.Print(a)
+}
+
+包的别名
+
+
+21.匿名导入包
+
+22.package 可以与上级目录不同名 ，导入规则如下
+
+Calc目录下 package命名为cblc
+在main.go中导入
+
+23.init函数
+
+
+24.golang 中的第三方包
+导入 第三方包的第一种方法
+在https://pkg.go.dev/中查找golang第三方包，找到girhub地址
+导入
+
+在vscode终端 输入
+
+再运行 即可自动关联
+
+导入第三方包的第二种方法(推荐) 会在右侧生成vendor目录
+
+25.接口
+结构体必须实现接口的全部方法，且可以有自己的方法
+//如果接口中有方法，必须要通过结构体或自定义类型实现这个接口
+type Usber interface {
+    start()
+    stop()
+}
+
+type Camera struct {
+    Name string
+}
+type Phone struct {
+    Name string
+}
+func (c Camera) start() {
+    fmt.Printf("%v启动\n", c.Name)
+}
+func (c Camera) stop() {
+    fmt.Printf("%v停止\n", c.Name)
+}
+func (p Phone) start() {
+    fmt.Printf("%v启动\n", p.Name)
+}
+func (p Phone) stop() {
+    fmt.Printf("%v停止\n", p.Name)
+}
+func (p Phone) comm() {
+    fmt.Printf("%v在通话\n", p.Name)
+}
+type Computer struct {
+}
+func (c Computer) work(u Usber) {
+    u.start()
+}
+func (c Computer) unwork(u Usber) {
+    u.stop()
+}
+func main() {
+    var p = Phone{
+        Name: "小米手机",
+    }
+    var cam = Camera{
+        Name: "照相机",
+    }
+    var c = Computer{}
+    c.work(p)
+    c.unwork(p)
+    c.work(cam)
+    c.unwork(cam)
+}
+
+    //也可以这样实现接口
+    var u Usber
+    u = p
+    u.start()
+
+26.空接口
+
+//A是一个空接口
+type A interface {
+}
+
+func main() {
+    var a A
+    var str = "字符串"
+    a = str
+    fmt.Printf("值:%v,类型:%T", a, a)
+}
+27.空接口当作任意类型使用
+//空接口可以直接当作类型使用,可以表示任何类型
+func main() {
+    var a interface{}
+    a = 20
+    fmt.Printf("值:%v,类型:%T\n", a, a)
+    a = "golang"
+    fmt.Printf("值:%v,类型:%T", a, a)
+}
+
+28.空接口作为形参，可传入任意类型的值
+func main() {
+    PrintInfo(20)
+    PrintInfo("你好golang")
+}
+//空接口当作参数，可以传入任意类型
+func PrintInfo(a interface{}){
+    fmt.Printf("值:%v,类型:%T\n",a,a)
+}
+29.用空接口 实现map和切片存放任意类型数据
+//用空接口实现map中的value为任意类型
+func main() {
+    var anymap = make(map[int]interface{})
+    anymap[1] = "name"
+    anymap[0] = 1
+    anymap[2] = 3.14
+    fmt.Println(anymap)
+
+    //用切片实现空接口
+    var anyslice = make([]interface{}, 3, 3)
+    anyslice = append(anyslice, 10, 2.15, "你好golang", anymap)
+    for _, v := range anyslice {
+        fmt.Println(v)
+    }
+}
+30.断言
+//断言:判断空接口中值的类型 x.(T)
+func main() {
+    var a interface{}
+    a = "hello golang"
+    v, ok := a.(string)
+    if ok {
+        fmt.Printf("断言成功,值：%v,类型:%T", v, v)
+    } else {
+        fmt.Println("断言失败")
+    }
+}
+31.断言应用 判断usber类型 是phone调用start() 是camera调用stop()
+type Usber interface {
+    start()
+    stop()
+}
+
+type Phone struct {
+    Name string
+}
+func (p Phone) start() {
+    fmt.Printf("%v启动", p.Name)
+}
+func (p Phone) stop() {
+    fmt.Printf("%v关闭", p.Name)
+}
+type Camera struct {
+    Name string
+}
+func (cam Camera) start() {
+    fmt.Printf("%v启动", cam.Name)
+}
+func (cam Camera) stop() {
+    fmt.Printf("%v关闭", cam.Name)
+}
+type Computer struct{}
+func (com Computer) how(u Usber) {
+    switch u.(type) {
+    case Phone:
+        u.start()
+        break
+    case Camera:
+        u.stop()
+        break
+    }
+}
+//如果是手机调用start()如果是相机调用stop()
+func main() {
+    var com = Computer{}
+    var p = Phone{
+        Name: "华为手机",
+    }
+    var cam = Camera{
+        Name: "相机",
+    }
+    com.how(p)
+    fmt.Print("\n")
+    com.how(cam)
+}
+32.值类型接收者
+//值类型接收者
+func (p Phone) start() {
+    fmt.Printf("%v启动\n", p.Name)
+}
+
+func (p Phone) stop() {
+    fmt.Printf("%v关闭\n", p.Name)
+}
+func main() {
+    //值类型接收 使用下面两个实例化方法都可以
+    var p1 = Phone{
+        Name: "华为手机",
+    }
+    var p2 = &Phone{
+        Name: "小米手机",
+    }
+    var u Usber
+    u = p1
+    u.start()
+    u = p2
+    u.stop()
+}
+
+33.指针类型接收者
+type Usber interface {
+    start()
+    stop()
+}
+
+type Phone struct {
+    Name string
+}
+//指针类型接收者
+func (p *Phone) start() {
+    fmt.Printf("%v启动\n", p.Name)
+}
+func (p *Phone) stop() {
+    fmt.Printf("%v关闭\n", p.Name)
+}
+func main() {
+    //指针类型接收 只能使用下面的实例化方法
+    var p2 = &Phone{
+        Name: "小米手机",
+    }
+    var u Usber
+    u = p2
+    u.stop()
+}
+34.值类型与指针类型应用
+//定义Animal接口，Animal中定义两个方法GetName() SetName()
+//分别让Dog结构体和Cat结构体实现这两个方法
+type Animal interface {
+    GetName()
+    SetName(name string)
+}
+
+type Dog struct {
+    Name string
+}
+func (dog *Dog) GetName() {
+    fmt.Printf("Dog_name:%v\n", dog.Name)
+}
+func (dog *Dog) SetName(name string) {
+    dog.Name = name
+}
+type Cat struct {
+    Name string
+}
+func (cat *Cat) GetName() {
+    fmt.Printf("Cat_name:%v\n", cat.Name)
+}
+//只能用指针接收，struct是值类型，无法改变name
+func (cat *Cat) SetName(name string) {
+    cat.Name = name
+}
+func main() {
+    var c = &Cat{
+        Name: "小猫",
+    }
+    var a Animal
+    a = c
+    a.GetName()
+    a.SetName("小小猫")
+    a.GetName()
+}
+35.同时实现两个接口
+//同时实现两个接口
+type Animal01 interface {
+    GetName()
+}
+type Animal02 interface {
+    SetName(name string)
+}
+type Dog struct {
+    Name string
+}
+
+func (dog *Dog) GetName() {
+    fmt.Printf("Dog_name:%v\n", dog.Name)
+}
+func (dog *Dog) SetName(name string) {
+    dog.Name = name
+}
+func main() {
+    var animal01 Animal01
+    var animal02 Animal02
+    var dog = &Dog{
+        Name: "小狗",
+    }
+    animal01 = dog
+    animal02 = dog
+    animal01.GetName()
+    animal02.SetName("小小狗")
+    animal01.GetName()
+}
+36.接口嵌套
+//接口嵌套 第一个接口中含有另外的接口 
+//实现第一个接口时要实现嵌套接口的方法
+type A interface {
+    GetName()
+}
+type B interface {
+    SetName(name string)
+}
+type Animal interface {
+    A
+    B
+}
+type Dog struct {
+    Name string
+}
+
+func (dog *Dog) GetName() {
+    fmt.Printf("Dog_name:%v\n", dog.Name)
+}
+func (dog *Dog) SetName(name string) {
+    dog.Name = name
+}
+func main() {
+    var dog = &Dog{
+        Name: "小黑",
+    }
+    var animal Animal
+    animal = dog
+    animal.GetName()
+    animal.SetName("小小黑")
+    animal.GetName()
+}
+37.空接口和类型断言的使用细节(如何获取Value为interface的数据)
+//空接口与类型断言的使用细节
+func main() {
+    var userinfo = make(map[string]interface{})
+    userinfo["hobby"] = []string{"睡觉", "吃饭"}
+    //如何获取睡觉
+    //错误  a := userinfo["hobby"][0]//(type interface {} does not support indexing)
+
+    var stu = Student{
+        Name: "wangchenglong",
+        Age:  18,
+    }
+    userinfo["StuInfo"] = stu
+    //如何获取Name
+    //错误 fmt.Println(userinfo["StuInfo"].Name)//(type interface {} is interface with no methods)
+    //如何获取以上的信息 使用断言
+    //1.获取睡觉
+    v1, _ := userinfo["hobby"].([]string)
+    fmt.Println(v1[0])
+    //2.获取Name
+    v2, _ := userinfo["StuInfo"].(Student)
+    fmt.Println(v2.Name)
+}
+
+
+
+
+
