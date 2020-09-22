@@ -1,0 +1,605 @@
+ 				        Golang笔记 
+1.定义变量 var usename string = “wcl” string可以省略   num:=10 只能用于定义局部变量
+2.忽略变量 匿名变量 _ 可重复说明
+Var(
+Username = “wcl”
+Age = 18 ;
+)
+Var name, _ = username, age;
+3.printf  格式化输出变量
+Printf(“a=%d,类型是%T”，a,a)
+4.常量  const a =3.14 声明常量时必须赋值且不可更改
+5.声明多个常量 如果后面不赋值  与第一个常量值一样
+Const(
+A = 1
+B//1
+C//1
+)
+iota在const关键字出现时将被重置为0(const内部的第一行之前)，const中每新增一行常量声明将使iota计数一次(iota可理解为const语句块中的行索引)  
+Const A =iota //0
+Const(                      
+B= iota //0
+C//1
+D//2
+E=iota//3
+F=100//100跳过4
+G//5
+)
+
+Const(                      
+A,B =iota+1,iota+2  //A,B行号为0  A=1B=2
+C,d//CD行号为1 C继承A表达式 D继承B  C=2 D=3
+E,f
+)
+6.-128   127  原理
+7.Println(unsafe.sizeof(a))//可以查看A的内存存储空间
+8.%d 十进制 %b二进制 %o八进制 %x十六进制
+%f 默认六位小数 默认float64（操作系统有几位一般就是几位 int类型也一样）%.2f两位浮点数， 3.14e2 =3.14 *10**2
+9.go语言中 布尔类型不可转换成其他类型
+10.输出多行字符串 `   `
+11.Len() 汉字每个三个字节 
+12.fmt.sprintf(“%v %v”a,b)字符串的拼接 
+13.strings.split(arr,”-”)要分割的字符串，以-分割 返回数组（切片） 
+14.Strings.Join(arr,”*”)将数组以*拼接
+15.Strings.contains(str1,str2)判断str1是否包含str2
+16.Strings.index(str1,str2)str1中出现str2的序号 strings.lastindex(str1,str2)最后一次出现的序号 
+17.定义数组(切片)  arr:=[]string{“java”,”php”}
+18.定义一个字符 并原样输出 var chr = ‘a’  fmt.printf(“%c(%v输出acsii) %T”,chr ,chr) 
+19.输出字符串中的单个字符 var str = “this” fmt.prinf(“%c”,str[2])
+20.修改字符串时 rune 与byte的区别
+str1 := "pig"
+    str2 := []byte(str1)
+    str2[0] ='p'
+    fmt.Printf(string(str2))
+
+    str3 := "大人"
+    str4 := []rune(str3)
+    str4[0] = '小'
+    fmt.Print(string(str4))
+Rune 代表一个utf8  byte类型只能处理英文
+21.含中文循环输出 
+s := "hello 王成龙"
+    for _, v := range s {
+        fmt.Printf("%c",v)
+    }
+22.把其他类型转换成string 类型 
+Fmt.sprintf(“%d”,str1)
+23.通过 strconv包进行格式转换
+其他类型转换成string
+Strconv.FormatInt(int64,进制)
+Strconv.FormatFloat(要转换的值，格式化类型f，保留的小数点尾数（-1表示不格式化小数点位数），格式化的类型)
+String转换成其他类型
+Strconv.parseInt(i,32)
+24.取余数注意
+10%-3    10-（10/-3)*-3  =1
+-10%3     -10-（-10/3）*3=-1
+25.i++  i- - 只能放后面 没有++i   只能单独使用 不能用在赋值中
+26. for key,value :=range arr{
+Fmt.printf(key,value)
+}
+27.switch case 结构体  extname 是string  case后跟的只能是string
+extname := "1"
+    switch extname {
+    case ".html":
+        fmt.Print(".html")
+        break
+    case ".css":
+        fmt.Print(".css")
+        break
+    default:
+        fmt.Print("找不到此后缀")
+        break
+}
+28.switch 后面跟条件判断
+num := 1233
+    switch {
+    case num%2 == 0:
+        fmt.Printf("num=%d是偶数", num)
+break
+    default:
+        fmt.Printf("num=%d不是偶数", num)
+break
+    }
+29.Fallthrough 穿透 只能穿透一层
+age := 29
+    switch {
+    case age < 30:
+        fmt.Print("小")
+        fallthrough
+    case age >= 30 && age < 50:
+        fmt.Print("中")
+        break
+    case age >= 50:
+        fmt.Print("大")
+        break
+    default:
+        fmt.Print("老")
+        break
+30.breakt跳出当前循环
+for i := 0; i < 2; i++ {
+        for j := 0; j < 3; j++ {
+            if j == 2 {
+                break
+            }
+            fmt.Printf("i=%d j=%d\n", i, j)
+        }
+跳出 j的for循环
+31.break指定跳出的循环
+
+32.continue 跳出本次循环 进入下一次循环  continue也可以和lable连用
+33.Goto语句 通过标签进行代码间的无条件跳转
+
+34.声明数组的方法
+//1.
+    var arr1 [3]int
+    arr1[0] = 1
+    arr1[1] = 2
+    arr1[2] = 3
+    fmt.Println(arr1[0])
+    //2.
+    var arr2 = [3]int{1, 2, 3}
+    fmt.Println(arr2[1])
+    //3.
+    var arr3 = [...]int{1, 2, 3, 4}
+    fmt.Println(len(arr3))
+    //4.
+    var arr4 = []int{0: 10, 1: 20, 2: 30, 3: 40}
+    fmt.Println(arr4)
+35.For range 循环输出数组
+
+36.切片与数组的不同 切片为引用类型（类似于指针） 数组为值类型
+
+37.二维数组 只有第一层可以【...】
+38.切片的定义
+
+39.基于数组定义切片
+
+40.切片的长度和容量
+
+41.make方法与append方法
+    
+42.容量扩充策略
+
+
+43.copy方法 解决切片引用类型的问题
+
+44.切片元素的删除
+
+45.封装好的排序方法
+(升序)
+//分别对Int float string类型的切片升序排序的方法
+    sort.Ints(要排序的切片)
+    sort.Float64s(要排序的切片)
+    sort.Strings(要排序的切片)
+(降序)
+sort.Sort(sort.Reverse(sort.IntSlice(要排序的int类型切片)))
+    sort.Sort(sort.Reverse(sort.Float64Slice(要排序的float类型切片)))
+    sort.Sort(sort.Reverse(sort.StringSlice(要排序的string类型切片)))
+46.创建map 
+//创建map的方法
+    //1.
+    var mapstr01 = make(map[string]string)
+    mapstr01["username"] = "wangchenglong"
+    mapstr01["age"] = "18"
+    mapstr01["sex"] = "man"
+    fmt.Println(mapstr01["username"])
+    fmt.Println(mapstr01["age"])
+    fmt.Println(mapstr01["sex"])
+    //2.
+    var mapstr02 = map[string]string{
+        "username": "fengyu",
+        "age":      "20",
+        "sex":      "women",
+    }
+    fmt.Println(mapstr02["username"])
+    fmt.Println(mapstr02["age"])
+    fmt.Println(mapstr02["sex"])
+    //3.
+    mapstr03 := map[string]string{
+        "username": "daizi",
+        "age":      "40",
+        "sex":      "men",
+    }
+    fmt.Println(mapstr03["username"])
+    fmt.Println(mapstr03["age"])
+    fmt.Println(mapstr03["sex"])
+47.用切片存map 并遍历
+//在切片中放一系列的用户信息，这是可以常见map类型的切片
+    var mapslice = make([]map[string]string, 2, 2)
+    mapslice[0] = make(map[string]string)
+    mapslice[1] = make(map[string]string)
+    mapslice[0]["username"] = "zhangsan"
+    mapslice[0]["age"] = "18"
+    mapslice[0]["sex"] = "man"
+    mapslice[1]["username"] = "lisi"
+    mapslice[1]["age"] = "20"
+    mapslice[1]["sex"] = "woman"
+
+    for _, v1 := range mapslice {
+        for _, v2 := range v1 {
+            fmt.Println(v2)
+        }
+    }
+48.map中的value为切片
+//在map中存一系列的属性，就可以在map中存切片
+    var mapstr = make(map[string][]string)
+    mapstr["wangchenglong"] = []string{"18cm", "180cm", "180min"}
+    mapstr["fengyu"] = []string{"18cm", "180cm", "180min"}
+
+    for _, v := range mapstr {
+        for _, v1 := range v {
+            fmt.Println(v1)
+        }
+    }
+
+49.引用类型（切片，数组）
+50.对map进行排序（按k值升序输出v）
+var mapInt = make(map[int]int, 5)
+    mapInt[0] = 80
+    mapInt[5] = 20
+    mapInt[1] = 30
+    mapInt[2] = 90
+    mapInt[9] = 1
+    var kslice []int
+    for k, _ := range mapInt {
+        kslice = append(kslice, k)
+    }
+    for i := 0; i < len(kslice); i++ {
+        min := kslice[i]
+        for j := i + 1; j < len(kslice); j++ {
+            if kslice[j] <= min {
+                var temp = min
+                kslice[i] = kslice[j]
+                kslice[j] = temp
+                min = kslice[i]
+            }
+        }
+    }
+    for _, v := range kslice {
+        fmt.Println(mapInt[v])
+    }
+51.记录一句话中出现个单词的个数
+
+
+
+52.方法写法
+ x,y同类型 可简写
+53.
+
+53.定义方法 实现切片的升降序
+//定义方法，实现切片的升序降序排列
+func main() {
+    var slice = []int{12, 34, 37, 556, 36, 2}
+    ascSlice := ascSort(slice)
+    fmt.Println(ascSlice)
+    descSlice := descSort(slice)
+    fmt.Println(descSlice)
+}
+
+func ascSort(a []int) []int {
+    for i := 0; i < len(a); i++ {
+        min := a[i]
+        for j := i + 1; j < len(a); j++ {
+            if a[j] <= min {
+                var temp int
+                temp = min
+                a[i] = a[j]
+                a[j] = temp
+                min = a[i]
+            }
+        }
+    }
+    return a
+}
+func descSort(a []int) []int {
+    for i := 0; i < len(a); i++ {
+        max := a[i]
+        for j := i + 1; j < len(a); j++ {
+            if a[j] >= max {
+                var temp int
+                temp = max
+                a[i] = a[j]
+                a[j] = temp
+                max = a[i]
+            }
+        }
+    }
+    return a
+}
+54.也可以使用封装好的排序方法
+//定义方法，按照key实现map的升序排列 最后输出key=>value
+func sortMap(a map[string]string) string {
+    var slice []string
+    for k, _ := range a {
+        slice = append(slice, k)
+    }
+    for i := 0; i < len(slice); i++ {
+        min := slice[i]
+        for j := i + 1; j < len(slice); j++ {
+            if min <= slice[j] {
+                var temp string
+                temp = min
+                slice[i] = slice[j]
+                slice[j] = temp
+                min = slice[i]
+            }
+        }
+    }
+    var str string
+    for _, v := range slice {
+        str += fmt.Sprintf("%v=>%v ", v, a[v])
+    }
+    return str
+}
+54.自定义函数类型
+func main() {
+    var a userAge
+    a = addAge
+    fmt.Println(a(5, 10))
+}
+
+type userAge func(a int, b int) int
+func addAge(x int, y int) int {
+    return x + y
+}
+55.函数作为参数 与返回值
+func main() {
+    a := returnAge(1)
+    fmt.Println(a(5, 20))
+}
+
+type userAge func(a int, b int) int
+func addAge(x int, y int) int {
+    return x + y
+}
+func subAge(x int, y int) int {
+    return x - y
+}
+//函数作为参数
+func sumAge(x int, y int, cb userAge) int {
+    return cb(x, y)
+}
+//函数作为返回值
+func returnAge(x int) userAge {
+    switch x {
+    case 1:
+        return addAge
+    case 2:
+        return subAge
+    default:
+        return func(a, b int) int {
+            return a * b
+        }
+    }
+}
+55.自执行匿名函数
+func main() {
+    a := func(a, b int) int {
+        return a + b
+    }(5, 6)
+    fmt.Println(a)
+}
+56.将匿名函数赋值给变量并执行
+func main() {
+    a := func(a, b int) int {
+        return a + b
+    }
+    fmt.Println(a(5, 6))
+}
+57.函数的递归调用
+//函数的递归调用
+
+var sum = 0
+//3. 递归实现 1 到100的和
+func getSum(a int) int {
+    if a <= 100 {
+        sum += a
+        a++
+        getNewSum(a)
+    }
+    return sum
+}
+func getNewSum(a int) int {
+    if a >= 1 {
+        return a + getNewSum(a-1)
+    } else {
+        return 0
+    }
+}
+var mulsum int = 1
+//4. 递归实现 5的阶乘
+func getMul(a int) int {
+    if a <= 5 {
+        mulsum *= a
+        a++
+        getMul(a)
+    }
+    return mulsum
+}
+func getNewmul(a int) int {
+    if a > 1 {
+        return a * getNewmul(a-1)
+    } else {
+        return 1
+    }
+}
+58.闭包
+func main() {
+    a := add()
+    fmt.Println(a(10))//20
+    fmt.Println(a(10))//30
+    fmt.Println(a(10))//40
+}
+
+//闭包:在一个函数内部创建另一个函数，通过另一个函数访问这个函数的局部变量
+//i这个局部变量对于返回的匿名函数来说 是全局变量
+func add() func(a int) int {
+    var i = 10 //常驻内存 不污染全局
+    return func(b int) int {
+        i += b
+        return i
+    }
+}
+59.defer语句
+
+匿名返回值 返回的是0 
+命名返回值 返回的是1
+
+func f1() int {
+    x := 5
+    defer func() {
+        x++
+    }()
+    return x
+}//5
+
+func f2() (x int) {
+    defer func() {
+        x++
+    }()
+    return 5
+}//6
+
+func f3() (y int) {
+    x := 5
+    defer func() {
+        x++
+    }()
+    return x
+}//5
+func f4() (x int) {
+    defer func(x int ) {
+        x++
+    }(x)
+    return 5
+}//5
+60.defer 一道面试题
+func main() {
+    //defer注册要延迟执行的函数时 所有的参数都要确定值
+    x := 1
+    y := 2
+    defer calc("AA", x, calc("A", x, y))
+    x = 10
+    defer calc("BB", x, calc("B", x, y))
+    y = 20
+}
+
+//1.注册顺序
+//calc("A", x, y) AA 1 3
+//calc("B", x, y) BB 10 12
+//2.执行顺序
+//calc("BB", x, calc("B", x, y)) BB 10 22
+//calc("AA", x, calc("A", x, y)) AA 1 4
+func calc(index string, a, b int) int {
+    ret := a + b
+    fmt.Println(index, a, b, ret)
+    return ret
+}
+
+61.golang没有异常处理机制 通过panic/recover来处理错误
+//golang 使用panic/recover来处理错误。panic可以在任何地方引发，recover只能
+//在defer调用的自执行函数中有效
+func main() {
+    myFn()
+}
+func readFile(fileName string) error {
+    if fileName == "mian.go" {
+        return nil
+    } else {
+        return errors.New("读取文件失败")
+    }
+}
+
+func myFn() {
+    defer func() {
+        error := recover()
+        if error != nil {
+            fmt.Println("给管理员发送邮件", error)
+        }
+    }()
+    err := readFile("shasha.go")
+    if err != nil {
+        panic(err)
+    }
+}
+62.没有使用panic 主动抛出异常
+func main() {
+    ifError()
+}
+
+func div(x, y int) int {
+    return x / y
+}
+func ifError() {
+    defer func() {
+        err := recover()
+        if err != nil {
+            fmt.Println("error", err)
+        }
+    }()
+    div(10, 0)
+}
+63.time包
+//1.打印当前时间
+func main() {
+    timeNow := time.Now()
+    year := timeNow.Year()
+    month := timeNow.Month()
+    day := timeNow.Day()
+    hour := timeNow.Hour()
+    minute := timeNow.Minute()
+    second := timeNow.Second()
+    fmt.Printf("当前时间为：%02d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second)
+}
+
+//2.格式化当前时间 使用的是golang诞生的时间 2006 1 2 3 4 5 
+func main() {
+    timeNow := time.Now()
+    timeFormat := timeNow.Format("2006-01-02 15:04:05")
+    fmt.Println(timeFormat)
+}
+//3.获取时间戳(自1970 1 1到现在的毫秒数)
+func main() {
+    timeNow := time.Now()
+    timeUnix := timeNow.Unix()
+    fmt.Println(timeUnix)
+}
+
+//4.获取时间戳(自1970 1 1到现在的毫秒数)并将时间戳格式化
+func main() {
+    timeUnix := time.Now().Unix()
+    timeobj := time.Unix(timeUnix, 0)
+    timeForamt := timeobj.Format("2006-01-02 15:04:05")
+    fmt.Println(timeForamt)
+}
+
+//5.把日期字符串转换为时间戳
+    str := time.Now().Format("2006-01-02 15:04:05")
+    strFormat := "2006-01-02 15:04:05"
+    timebefore, _ := time.ParseInLocation(strFormat, str, time.Local)
+    fmt.Println(timebefore.Unix())
+64.定时器
+func main() {
+    // 定时器
+    timeTicker := time.NewTicker(time.Second)
+    var num = 5
+    for t := range timeTicker.C {
+        num--
+        fmt.Println(t)
+        if num == 0 {
+            timeTicker.Stop()
+            break
+        }
+    }
+}
+
+65 定时器2
+func main() {
+    fmt.Println("aaa")
+    time.Sleep(time.Second)
+    fmt.Println("aaa")
+    time.Sleep(time.Second)
+    fmt.Println("aaa")
+    time.Sleep(time.Second)
+    fmt.Println("aaa")
+}
