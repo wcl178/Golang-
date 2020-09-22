@@ -1,0 +1,213 @@
+Golang笔记04
+1.读取文件(方法1)
+func main() {
+    //读取文件(方法1)
+    /*
+        1.只读方式打开文件 file,err := os.Open()
+        2.读取文件 file.Read()
+        3.关闭文件 defer file.Close()
+    */
+    var tempSlice = make([]byte, 128) //128个字节的切片
+    var AllSlice []byte
+    file, err := os.Open("./main.go")
+    if err != nil {
+        fmt.Println("读取文件失败")
+    }
+    for {
+        n, err := file.Read(tempSlice)
+        if err == io.EOF {
+            fmt.Println("读取完毕")
+            break
+        }
+        if err != nil {
+            fmt.Println("读取失败")
+            return
+        }
+        //如果最后一次读取的不是128个字节
+        //Read()采用覆盖，还保留了上一次读到的数据
+        //只是apeend(slice01,slice02...)会添加上一次的数据
+        AllSlice = append(AllSlice, tempSlice[:n]...)
+        fmt.Printf("读取到%v个字节\n", n)
+    }
+    fmt.Println(string(AllSlice))
+}
+2.读取文件(方法2)
+func main() {
+    //读取文件(方法2)
+    /*
+        1.只读方式打开文件 file,err := os.Open()
+        2.创建reader对象 reader:= bufio.NewReader(file)
+        3.ReadString 读取文件 line,err:= reader.ReadString('\n')
+        4.关闭文件 defer file.Close()
+    */
+    var AllStr string
+    file, err := os.Open("./main.go")
+    reader := bufio.NewReader(file)
+    defer file.Close()
+    if err != nil {
+        fmt.Println("读取文件失败")
+    }
+    for {
+        str, err := reader.ReadString('\n') //一次读取一行
+        if err == io.EOF {
+            //注意与第一种读取方法panic的不同
+            AllStr += str
+            break
+        }
+        if err != nil {
+            fmt.Println("读取失败")
+            return
+        }
+        AllStr += str
+    }
+    fmt.Println(AllStr)
+    fmt.Println("读取完毕")
+}
+
+3.读取文件(方法3)
+func main() {
+    //读取文件(方法3)
+    /*
+        打开关闭文件的方法已经封装好了
+        只需要一句话就可以读取
+        ioutil.ReaderFile("./main.go")
+    */
+    byteArr, err := ioutil.ReadFile("./main.go")
+    if err != nil {
+        fmt.Println("读取文件失败")
+    }
+    fmt.Println(string(byteArr))
+}
+4.写入文件(方法1)
+
+func main() {
+    //写入文件(方法1)
+    /*
+        1.打开文件 file,err ：= os.OpenFile("./main.go",os.O_CREATE|os.O_RDWR,0666)
+        2.写入文件
+        file.Write([]byte(str))//写入字节切片数据
+        file.WriteString("直接写入字符串数据")//直接写入字符串数据
+        3.关闭字节流
+        file.Close()
+    */
+    //追加权限 |
+    file, err := os.OpenFile("C:/Users/lenovo/Desktop/SMB笔记/test.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+    if err != nil {
+        fmt.Println("读取文件失败")
+    }
+    defer file.Close()
+    for i := 0; i < 10; i++ {
+        //txt文件换行 /r/n
+        var str = "直接写入字符串" + strconv.Itoa(i) + "\r\n"
+        file.Write([]byte(str))
+    }
+
+}
+5.写入文件(方法2)
+/*
+写入文件(方法2)
+1.打开文件 file,err := os.OpenFile("./main.go",os.O_CREATE|os.O_RDWR,0666")
+2.创建writer对象 writer := bufio.NewWriter(file)
+3.将数据写入缓存 writer.WriteString("你好golang\r\n")
+4.将缓存中的数据 写入文件 writer.Flush()
+5.关闭文件 file.Close()
+*/
+func main() {
+    file, err := os.OpenFile("C:/Users/lenovo/Desktop/SMB笔记/test.txt", os.O_WRONLY|os.O_TRUNC, 0666)
+    defer file.Close()
+    writer := bufio.NewWriter(file)
+    if err != nil {
+        fmt.Println("写入文件失败")
+        return
+    }
+    for i := 1; i < 10; i++ {
+        writer.WriteString("直接写入字符串" + strconv.Itoa(i) + "\r\n")
+    }
+    writer.Flush()
+    fmt.Println("写入完毕")
+}
+
+6.写入文件(方法3)
+/*
+写入文件(方法3)
+str := "hello golang"
+err := ioutil.WriteFile("C:/Users/lenovo/Desktop/SMB笔记/test.txt",[]byte(str),0666)*/
+
+func main() {
+    str := "你好golang"
+    err := ioutil.WriteFile("C:/Users/lenovo/Desktop/SMB笔记/test.txt",[]byte(str),0666)
+    if err != nil{
+        fmt.Println("写入文件失败")
+    }
+}
+
+
+7.拷贝文件
+//拷贝文件 边读边写
+func main() {
+    file1, err1 := os.Open("C:/Users/lenovo/Desktop/SMB笔记/test.txt")
+    file2, err2 := os.OpenFile("C:/Users/lenovo/Desktop/SMB笔记/test01.txt", os.O_TRUNC|os.O_WRONLY, 0666)
+    defer file1.Close()
+    defer file2.Close()
+    if err1 != nil {
+        fmt.Println("读取失败")
+    }
+    if err2 != nil {
+        fmt.Println("写入失败")
+    }
+    var bytestr = make([]byte, 128)
+    for {
+        n, err1 := file1.Read(bytestr)
+        if err1 == io.EOF {
+            break
+        }
+        if err1 != nil {
+            fmt.Println("读取文件失败")
+        }
+        _, err2 := file2.Write(bytestr[:n])
+        if err2 != nil {
+            fmt.Println("写入文件失败")
+        }
+    }
+    fmt.Println("拷贝完成")
+}
+8.创建单级/多级目录
+func main() {
+    //创建单级目录
+    //存在目录会报err
+    err := os.Mkdir("./dir", 0666)
+    if err != nil {
+        fmt.Println("创建文件夹失败")
+    }
+
+    //创建多级目录
+    //存在目录 也不会报err
+    os.MkdirAll("./dir/dir1/dir2", 0666)
+}
+
+9.删除目录、文件
+func main() {
+    //删除一个文件或者目录
+    //文件不存在会err
+    err := os.Remove("./aaa.txt")
+    if err != nil {
+        fmt.Println("删除文件失败")
+    }
+    //删除多个文件目录，不会报err
+    err := os.RemoveAll("./dir")
+    if err != nil {
+        fmt.Println("删除文件失败")
+    }
+}
+
+10.重命名
+func main() {
+    //重命名
+    err := os.Rename("C:/Users/lenovo/Desktop/SMB笔记/test.txt", "C:/Users/lenovo/Desktop/SMB笔记/test01.txt")
+    if err != nil {
+        fmt.Println("重命名失败")
+    }
+    fmt.Println("重命名成功")
+}
+
+
